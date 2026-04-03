@@ -30,6 +30,7 @@ class BeyondConfig:
     osc_port: int = 12000
     allowed_hosts: frozenset[str] = field(default_factory=lambda: frozenset({"127.0.0.1", "localhost", "::1"}))
     read_only: bool = False
+    confirm_destructive: bool = False
 
     @property
     def target(self) -> str:
@@ -50,12 +51,14 @@ def load_config() -> BeyondConfig:
     host = os.getenv("BEYOND_HOST", "127.0.0.1")
     allowed_raw = os.getenv("BEYOND_ALLOWED_HOSTS", _DEFAULT_ALLOWED_HOSTS)
     read_only = os.getenv("BEYOND_READ_ONLY", "0").lower() in ("1", "true", "yes")
+    confirm_destructive = os.getenv("BEYOND_CONFIRM_DESTRUCTIVE", "0").lower() in ("1", "true", "yes")
 
     config = BeyondConfig(
         host=host,
         osc_port=_parse_port("BEYOND_OSC_PORT", "12000"),
         allowed_hosts=_parse_allowed_hosts(allowed_raw),
         read_only=read_only,
+        confirm_destructive=confirm_destructive,
     )
     config.check_host_allowed()
     return config
