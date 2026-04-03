@@ -55,6 +55,10 @@ Build-specific notes:
 
 Full notes: [docs/live-validation.md](docs/live-validation.md)
 
+See also:
+- [docs/mcp-config-examples.md](docs/mcp-config-examples.md)
+- [docs/operator-workflows.md](docs/operator-workflows.md)
+
 ## Configuration
 
 | Variable | Default | Description |
@@ -308,7 +312,11 @@ uv run python -m beyond_mcp
 | `virtual_lj` | Enable or disable Virtual LJ mode |
 | `virtual_lj_fx` | Trigger a Virtual LJ effect |
 
-## Claude Desktop
+## MCP Client Setup
+
+Quick examples:
+
+### Claude Desktop
 
 ```json
 {
@@ -325,7 +333,7 @@ uv run python -m beyond_mcp
 }
 ```
 
-## VS Code / Cursor
+### VS Code / Cursor
 
 ```json
 {
@@ -341,6 +349,8 @@ uv run python -m beyond_mcp
   }
 }
 ```
+
+More examples, including LAN-targeted setups: [docs/mcp-config-examples.md](docs/mcp-config-examples.md)
 
 ## Production safety
 
@@ -358,6 +368,20 @@ This server is designed for live show environments where accidental commands can
 - **Transport validation** -- only `stdio`, `sse`, and `streamable-http` transports are accepted. Invalid transport values raise immediately at startup.
 - **Port validation** -- `BEYOND_OSC_PORT` is validated as an integer in the 1-65535 range at config load time.
 - **Raw escape hatch** -- `send_osc_raw` allows any OSC address for coverage beyond the named tools, but requires explicit JSON array input and validates structure before sending.
+
+## Suggested Operator Flow
+
+For first use on a new BEYOND machine:
+
+1. `get_server_config`
+2. `health_check`
+3. `display_popup`
+4. `set_bpm`
+5. page/tab navigation
+6. non-critical cue start/stop
+7. live parameter tests like master brightness
+
+More practical sequences: [docs/operator-workflows.md](docs/operator-workflows.md)
 
 ## Development
 
