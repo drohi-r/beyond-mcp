@@ -162,6 +162,7 @@ def get_server_config() -> str:
         "osc_port": config.osc_port,
         "target": config.target,
         "allowed_hosts": sorted(config.allowed_hosts),
+        "safety_profile": config.safety_profile,
         "read_only": config.read_only,
         "confirm_destructive": config.confirm_destructive,
     })

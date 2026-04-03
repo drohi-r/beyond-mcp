@@ -4,6 +4,11 @@ import os
 from dataclasses import dataclass, field
 
 _DEFAULT_ALLOWED_HOSTS = "127.0.0.1,localhost,::1"
+_SAFETY_PROFILES = frozenset({"lab", "show-safe", "read-only"})
+
+
+def _parse_bool(raw: str) -> bool:
+    return raw.lower() in ("1", "true", "yes")
 
 
 def _parse_port(env_name: str, default: str) -> int:
@@ -29,6 +34,7 @@ class BeyondConfig:
     host: str = "127.0.0.1"
     osc_port: int = 12000
     allowed_hosts: frozenset[str] = field(default_factory=lambda: frozenset({"127.0.0.1", "localhost", "::1"}))
+    safety_profile: str = "lab"
     read_only: bool = False
     confirm_destructive: bool = False
 
@@ -47,16 +53,37 @@ class BeyondConfig:
             )
 
 
+def _load_safety_profile() -> tuple[str, bool, bool]:
+    profile = os.getenv("BEYOND_SAFETY_PROFILE", "lab").strip().lower() or "lab"
+    if profile not in _SAFETY_PROFILES:
+        raise ValueError(
+            f"BEYOND_SAFETY_PROFILE={profile!r} is invalid. "
+            f"Choose one of: {', '.join(sorted(_SAFETY_PROFILES))}."
+        )
+
+    defaults = {
+        "lab": {"read_only": False, "confirm_destructive": False},
+        "show-safe": {"read_only": False, "confirm_destructive": True},
+        "read-only": {"read_only": True, "confirm_destructive": True},
+    }[profile]
+
+    read_only = _parse_bool(os.getenv("BEYOND_READ_ONLY", "1" if defaults["read_only"] else "0"))
+    confirm_destructive = _parse_bool(
+        os.getenv("BEYOND_CONFIRM_DESTRUCTIVE", "1" if defaults["confirm_destructive"] else "0")
+    )
+    return profile, read_only, confirm_destructive
+
+
 def load_config() -> BeyondConfig:
     host = os.getenv("BEYOND_HOST", "127.0.0.1")
     allowed_raw = os.getenv("BEYOND_ALLOWED_HOSTS", _DEFAULT_ALLOWED_HOSTS)
-    read_only = os.getenv("BEYOND_READ_ONLY", "0").lower() in ("1", "true", "yes")
-    confirm_destructive = os.getenv("BEYOND_CONFIRM_DESTRUCTIVE", "0").lower() in ("1", "true", "yes")
+    profile, read_only, confirm_destructive = _load_safety_profile()
 
     config = BeyondConfig(
         host=host,
         osc_port=_parse_port("BEYOND_OSC_PORT", "12000"),
         allowed_hosts=_parse_allowed_hosts(allowed_raw),
+        safety_profile=profile,
         read_only=read_only,
         confirm_destructive=confirm_destructive,
     )

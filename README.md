@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge" alt="Python 3.12+">
   <img src="https://img.shields.io/badge/MCP_Tools-117-F59E0B?style=for-the-badge" alt="117 MCP Tools">
   <img src="https://img.shields.io/badge/Categories-20-F59E0B?style=for-the-badge" alt="20 Categories">
-  <img src="https://img.shields.io/badge/Tests-305-F59E0B?style=for-the-badge" alt="305 Tests">
+  <img src="https://img.shields.io/badge/Tests-310-F59E0B?style=for-the-badge" alt="310 Tests">
 </p>
 
 An MCP server for [Pangolin BEYOND](https://pangolin.com/pages/beyond) laser software. Exposes 117 tools across 20 categories covering show control, cue management, zone configuration, geometric correction, live parameter control, effects, projector alignment, safety limiters, and more — all via OSC.
@@ -37,6 +37,24 @@ For remote control:
 - allow UDP to `BEYOND_OSC_PORT`
 - set `BEYOND_HOST` to the remote machine and include it in `BEYOND_ALLOWED_HOSTS`
 
+## Live-Validated Build Notes
+
+This repo has been exercised against a real BEYOND instance over LAN, not only mocked unit tests.
+
+Live-confirmed tools on the validated build:
+- `display_popup`
+- `set_bpm`
+- `select_next_page` / `select_prev_page`
+- `select_next_tab` / `select_prev_tab`
+- `start_cue_by_name` / `stop_cue_by_name`
+- `set_master_brightness`
+
+Build-specific notes:
+- `load_cue` sent cleanly but did not produce an obvious visible state change in the tested workspace.
+- `display_preview("main", ...)` sent cleanly, but `main` did not appear to be the correct preview identifier for the validated BEYOND setup.
+
+Full notes: [docs/live-validation.md](docs/live-validation.md)
+
 ## Configuration
 
 | Variable | Default | Description |
@@ -44,9 +62,32 @@ For remote control:
 | `BEYOND_HOST` | `127.0.0.1` | BEYOND instance IP |
 | `BEYOND_OSC_PORT` | `12000` | OSC receive port |
 | `BEYOND_ALLOWED_HOSTS` | `127.0.0.1,localhost,::1` | Comma-separated allowlist for target hosts. Set `*` to allow any. |
+| `BEYOND_SAFETY_PROFILE` | `lab` | Safety preset: `lab`, `show-safe`, or `read-only` |
 | `BEYOND_READ_ONLY` | `0` | Set to `1` for read-only mode (blocks all write operations) |
 | `BEYOND_CONFIRM_DESTRUCTIVE` | `0` | Set to `1` to require `confirm=true` on destructive operations (blackout, stop_all, etc.) |
 | `BEYOND_TRANSPORT` | `stdio` | MCP transport (`stdio`, `sse`, `streamable-http`) |
+
+## Safety Profiles
+
+`BEYOND_SAFETY_PROFILE` gives you a sane starting point without having to remember multiple flags:
+
+- `lab`
+  - `read_only = false`
+  - `confirm_destructive = false`
+- `show-safe`
+  - `read_only = false`
+  - `confirm_destructive = true`
+- `read-only`
+  - `read_only = true`
+  - `confirm_destructive = true`
+
+Explicit environment flags still win if you need to override the profile:
+
+```bash
+BEYOND_SAFETY_PROFILE=show-safe \
+BEYOND_CONFIRM_DESTRUCTIVE=0 \
+uv run python -m beyond_mcp
+```
 
 ## Tools
 

@@ -1,4 +1,4 @@
-"""Tests for all 116 BEYOND MCP server tools and safety features."""
+"""Tests for all 117 BEYOND MCP server tools and safety features."""
 
 import json
 import os
@@ -186,6 +186,7 @@ def test_get_server_config():
     assert payload["osc_port"] == 12000
     assert "target" in payload
     assert "allowed_hosts" in payload
+    assert payload["safety_profile"] == "lab"
     assert "read_only" in payload
     assert "confirm_destructive" in payload
 
