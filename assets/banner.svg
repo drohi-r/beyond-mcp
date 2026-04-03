@@ -1,0 +1,76 @@
+<svg width="1600" height="520" viewBox="0 0 1600 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Beyond MCP</title>
+  <desc id="desc">MCP server for Pangolin BEYOND laser software — 44 tools for show control via OSC.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A0A0A"/>
+      <stop offset="1" stop-color="#060606"/>
+    </linearGradient>
+
+    <linearGradient id="beamFill1" x1="1520" y1="0" x2="600" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.65"/>
+      <stop offset="0.35" stop-color="#D97706" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#B45309" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="beamFill2" x1="1600" y1="0" x2="900" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.4"/>
+      <stop offset="0.35" stop-color="#D97706" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#B45309" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="beamFill3" x1="1440" y1="0" x2="400" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FBBF24" stop-opacity="0.35"/>
+      <stop offset="0.3" stop-color="#F59E0B" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#D97706" stop-opacity="0"/>
+    </linearGradient>
+
+    <radialGradient id="srcGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.7"/>
+      <stop offset="0.4" stop-color="#D97706" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#B45309" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="ambient" cx="0.65" cy="0.15" r="0.65" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#F59E0B" stop-opacity="0.035"/>
+      <stop offset="1" stop-color="#D97706" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="520" fill="url(#bg)"/>
+  <rect width="1600" height="520" fill="url(#ambient)"/>
+
+  <polygon points="1500,0 1560,0 800,520 600,520" fill="url(#beamFill3)"/>
+  <polygon points="1555,0 1600,0 920,520 680,520" fill="url(#beamFill1)"/>
+  <polygon points="1600,0 1600,35 1120,520 980,520" fill="url(#beamFill2)"/>
+
+  <line x1="1530" y1="0" x2="700" y2="520" stroke="#F59E0B" stroke-width="0.8" opacity="0.2"/>
+  <line x1="1578" y1="0" x2="800" y2="520" stroke="#F59E0B" stroke-width="0.8" opacity="0.25"/>
+  <line x1="1600" y1="18" x2="1050" y2="520" stroke="#F59E0B" stroke-width="0.8" opacity="0.15"/>
+
+  <circle cx="1590" cy="0" r="70" fill="url(#srcGlow)"/>
+
+  <text x="80" y="80" fill="#484848" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" letter-spacing="5">PANGOLIN BEYOND LASER CONTROL</text>
+
+  <rect x="80" y="96" width="70" height="2.5" rx="1.25" fill="#F59E0B"/>
+
+  <text x="66" y="240" fill="#FFFFFF" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="138" font-weight="900" letter-spacing="2">BEYOND</text>
+
+  <text x="84" y="290" fill="#3D3D3D" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="600" letter-spacing="6">SHOW CONTROL · CUES · ZONES · OSC</text>
+
+  <rect x="80" y="410" width="360" height="1" fill="#1C1C1C"/>
+
+  <g transform="translate(80, 450)">
+    <text x="0" y="0" fill="#F59E0B" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900">44</text>
+    <text x="46" y="0" fill="#3D3D3D" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" letter-spacing="3">TOOLS</text>
+
+    <circle cx="120" cy="-5" r="2" fill="#252525"/>
+
+    <text x="140" y="0" fill="#F59E0B" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900">9</text>
+    <text x="164" y="0" fill="#3D3D3D" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" letter-spacing="3">CATEGORIES</text>
+  </g>
+
+  <rect x="80" y="472" width="240" height="1.5" rx="0.75" fill="#F59E0B" opacity="0.12"/>
+
+  <text x="1520" y="492" fill="#1E1E1E" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="600" letter-spacing="4" text-anchor="end">MODEL CONTEXT PROTOCOL</text>
+</svg>
