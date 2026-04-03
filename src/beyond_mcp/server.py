@@ -17,7 +17,7 @@ from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
-from .client import BeyondClient, build_osc_message
+from .client import BeyondClient, build_osc_bundle, build_osc_message
 from .config import load_config
 
 
@@ -141,6 +141,12 @@ def _validate_string_choice(value: str, name: str, choices: set[str]) -> None:
         raise ValueError(f"{name} must be one of {sorted(choices)}, got {value!r}")
 
 
+def _optional_timetag(value: int) -> int | None:
+    if value < 0:
+        return None
+    return value
+
+
 # ============================================================
 # System
 # ============================================================
@@ -182,7 +188,7 @@ def send_osc_raw(address: str, values_json: str = "[]", type_tags: str = "", con
 
 @mcp.tool()
 @_handle_errors
-def send_osc_bundle(messages_json: str, confirm: bool = False) -> str:
+def send_osc_bundle(messages_json: str, confirm: bool = False, timetag: int = -1) -> str:
     """Send multiple OSC messages as an atomic bundle.
 
     messages_json: JSON array of [address, values] pairs.
@@ -201,7 +207,7 @@ def send_osc_bundle(messages_json: str, confirm: bool = False) -> str:
             raise ValueError(f"Entry {i}: address must be string, values must be array.")
         _check_destructive_address(addr, confirm)
         pairs.append((addr, vals))
-    result = _client().send_bundle(pairs)
+    result = _client().send_bundle(pairs, timetag=_optional_timetag(timetag))
     return _json(result)
 
 
@@ -224,6 +230,38 @@ def preview_osc(address: str, values_json: str = "[]", type_tags: str = "") -> s
         "target_port": config.osc_port,
         "packet_bytes": len(packet),
         "note": "This is a preview only. No OSC message was sent.",
+    })
+
+
+@mcp.tool()
+@_handle_errors
+def preview_osc_bundle(messages_json: str, timetag: int = -1) -> str:
+    """Preview an OSC bundle without sending it."""
+    messages = json.loads(messages_json)
+    if not isinstance(messages, list):
+        raise ValueError("messages_json must be a JSON array.")
+    packets = []
+    parsed_messages = []
+    for i, entry in enumerate(messages):
+        if not isinstance(entry, list) or len(entry) != 2:
+            raise ValueError(f"Entry {i} must be [address, values_array].")
+        addr, vals = entry
+        if not isinstance(addr, str) or not isinstance(vals, list):
+            raise ValueError(f"Entry {i}: address must be string, values must be array.")
+        packets.append(build_osc_message(addr, vals))
+        parsed_messages.append({"address": addr, "values": vals})
+    config = load_config()
+    bundle = build_osc_bundle(packets, timetag=_optional_timetag(timetag))
+    return _json({
+        "preview": True,
+        "bundle": True,
+        "message_count": len(parsed_messages),
+        "messages": parsed_messages,
+        "target_host": config.host,
+        "target_port": config.osc_port,
+        "timetag": _optional_timetag(timetag) if _optional_timetag(timetag) is not None else 1,
+        "packet_bytes": len(bundle),
+        "note": "This is a preview only. No OSC bundle was sent.",
     })
 
 

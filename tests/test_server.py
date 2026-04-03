@@ -13,6 +13,7 @@ from beyond_mcp.server import (
     send_osc_raw,
     send_osc_bundle,
     preview_osc,
+    preview_osc_bundle,
     # Master Controls
     set_master_brightness,
     blackout,
@@ -264,6 +265,15 @@ def test_send_osc_bundle_valid(mock_client):
     assert args == [("/beyond/general/BlackOut", []), ("/beyond/general/SetBpm", [120])]
 
 
+@patch("beyond_mcp.server._client")
+def test_send_osc_bundle_with_timetag(mock_client):
+    fake = _fake_client()
+    mock_client.return_value = fake
+    msg = '[["/beyond/general/SetBpm", [120]]]'
+    json.loads(send_osc_bundle(msg, timetag=99))
+    fake.send_bundle.assert_called_once_with([("/beyond/general/SetBpm", [120])], timetag=99)
+
+
 def test_send_osc_bundle_invalid_json():
     payload = json.loads(send_osc_bundle("not json"))
     assert payload["ok"] is False
@@ -329,6 +339,14 @@ def test_preview_osc():
     assert payload["address"] == "/beyond/general/BlackOut"
     assert payload["packet_bytes"] > 0
     assert "No OSC message was sent" in payload["note"]
+
+
+def test_preview_osc_bundle():
+    payload = json.loads(preview_osc_bundle('[["/beyond/general/SetBpm", [120]]]'))
+    assert payload["preview"] is True
+    assert payload["bundle"] is True
+    assert payload["message_count"] == 1
+    assert payload["packet_bytes"] > 0
 
 
 def test_preview_osc_with_values():
@@ -2461,10 +2479,10 @@ def test_type_tags_length_mismatch():
 # ================================================================
 
 
-def test_tool_count_is_116():
+def test_tool_count_is_117():
     from beyond_mcp.server import mcp as server_mcp
 
     tools = server_mcp._tool_manager._tools
-    assert len(tools) == 116, (
-        f"Expected 116 tools, got {len(tools)}: {sorted(tools.keys())}"
+    assert len(tools) == 117, (
+        f"Expected 117 tools, got {len(tools)}: {sorted(tools.keys())}"
     )

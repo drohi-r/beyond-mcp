@@ -7,12 +7,12 @@
 <p align="center">
   <a href="https://github.com/drohi-r/beyond-mcp/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-orange?style=for-the-badge" alt="License"></a>
   <img src="https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge" alt="Python 3.12+">
-  <img src="https://img.shields.io/badge/MCP_Tools-116-F59E0B?style=for-the-badge" alt="116 MCP Tools">
+  <img src="https://img.shields.io/badge/MCP_Tools-117-F59E0B?style=for-the-badge" alt="117 MCP Tools">
   <img src="https://img.shields.io/badge/Categories-20-F59E0B?style=for-the-badge" alt="20 Categories">
-  <img src="https://img.shields.io/badge/Tests-284-F59E0B?style=for-the-badge" alt="284 Tests">
+  <img src="https://img.shields.io/badge/Tests-305-F59E0B?style=for-the-badge" alt="305 Tests">
 </p>
 
-An MCP server for [Pangolin BEYOND](https://pangolin.com/pages/beyond) laser software. Exposes 116 tools across 20 categories covering show control, cue management, zone configuration, geometric correction, live parameter control, effects, projector alignment, safety limiters, and more — all via OSC.
+An MCP server for [Pangolin BEYOND](https://pangolin.com/pages/beyond) laser software. Exposes 117 tools across 20 categories covering show control, cue management, zone configuration, geometric correction, live parameter control, effects, projector alignment, safety limiters, and more — all via OSC.
 
 Built for live production. Pairs with [MA2 Agent](https://github.com/drohi-r/grandma2-mcp), [Resolume MCP](https://github.com/drohi-r/resolume-mcp), and [Companion MCP](https://github.com/drohi-r/companion-mcp) for full AI-driven show control.
 
@@ -32,6 +32,11 @@ uv run python -m beyond_mcp
 
 Make sure BEYOND is running with OSC input enabled (configurable via `BEYOND_OSC_PORT`, defaults to 12000).
 
+For remote control:
+- use LAN or WireGuard, not the public internet
+- allow UDP to `BEYOND_OSC_PORT`
+- set `BEYOND_HOST` to the remote machine and include it in `BEYOND_ALLOWED_HOSTS`
+
 ## Configuration
 
 | Variable | Default | Description |
@@ -50,10 +55,11 @@ Make sure BEYOND is running with OSC input enabled (configurable via `BEYOND_OSC
 | Tool | What it does |
 |------|-------------|
 | `get_server_config` | Return current MCP server configuration and safety settings |
-| `health_check` | Check if the BEYOND target is reachable (DNS resolution + UDP socket) |
+| `health_check` | Check if the BEYOND target is reachable and report resolved socket details |
 | `send_osc_raw` | Send a raw OSC message for any address not wrapped by a named tool |
 | `send_osc_bundle` | Send multiple OSC messages as an atomic bundle |
 | `preview_osc` | Preview an OSC message without sending it (dry-run inspection) |
+| `preview_osc_bundle` | Preview an OSC bundle without sending it |
 
 ### Master Controls
 
@@ -297,16 +303,16 @@ Make sure BEYOND is running with OSC input enabled (configurable via `BEYOND_OSC
 
 ## Production safety
 
-This server is designed for live show environments where accidental commands can disrupt a running laser show. All 116 tools include full parameter validation.
+This server is designed for live show environments where accidental commands can disrupt a running laser show. All 117 tools include full parameter validation.
 
 - **UDP fire-and-forget** -- BEYOND OSC control uses UDP, meaning commands are sent without acknowledgement. There is no rollback. Every tool call is a real action on the laser system.
 - **Host allowlisting** -- only `127.0.0.1`, `localhost`, and `::1` are permitted by default. Add LAN hosts explicitly via `BEYOND_ALLOWED_HOSTS`. Set `*` to allow any host.
-- **Read-only mode** -- set `BEYOND_READ_ONLY=1` to block all write operations. Only `get_server_config`, `health_check`, and `preview_osc` remain available.
-- **Confirm-destructive gating** -- set `BEYOND_CONFIRM_DESTRUCTIVE=1` to require `confirm=true` on destructive operations (`blackout`, `stop_all_now`, `stop_all_sync`, `stop_all_async`, `disable_laser_output`, `stop_zones_of_projector`). Prevents accidental show-stopping commands from AI assistants.
-- **Health check** -- `health_check` verifies BEYOND target reachability via DNS resolution and UDP socket test before sending commands.
+- **Read-only mode** -- set `BEYOND_READ_ONLY=1` to block all write operations. Only `get_server_config`, `health_check`, `preview_osc`, and `preview_osc_bundle` remain available.
+- **Confirm-destructive gating** -- set `BEYOND_CONFIRM_DESTRUCTIVE=1` to require `confirm=true` on destructive operations, including raw/bundle sends of destructive OSC addresses and disruptive named tools like `load_workspace`, `stop_zone`, and `stop_projector_by_name`.
+- **Health check** -- `health_check` verifies BEYOND target reachability via DNS resolution and UDP socket test and reports the resolved address family/socket target.
 - **OSC bundle support** -- `send_osc_bundle` sends multiple OSC messages as an atomic bundle, ensuring all-or-nothing delivery for coordinated multi-parameter changes.
-- **Preview before send** -- `preview_osc` returns the exact OSC packet details (address, values, type tags, target) without transmitting anything. Use this to inspect what a command will do before committing.
-- **Input validation** -- all 116 tools with documented parameter ranges enforce bounds before any OSC message is built. Brightness, zoom, scan rate, size, position, rotation, color, BPM, speed, fade times, effect slots, limiter types, and geometric correction parameters are all range-checked. Invalid inputs return structured JSON errors, never raw exceptions.
+- **Preview before send** -- `preview_osc` and `preview_osc_bundle` return the exact packet details without transmitting anything. Use them before high-risk live operations.
+- **Input validation** -- all 117 tools with documented parameter ranges enforce bounds before any OSC message is built. Brightness, zoom, scan rate, size, position, rotation, color, BPM, speed, fade times, effect slots, limiter types, geometric correction parameters, and non-negative indexes are all range-checked. Invalid inputs return structured JSON errors, never raw exceptions.
 - **Error isolation** -- all tools are wrapped in `_handle_errors`. OSC send failures, JSON parse errors, validation failures, and unexpected exceptions return `{"ok": false, "error": "...", "blocked": true}` instead of crashing the MCP session.
 - **Transport validation** -- only `stdio`, `sse`, and `streamable-http` transports are accepted. Invalid transport values raise immediately at startup.
 - **Port validation** -- `BEYOND_OSC_PORT` is validated as an integer in the 1-65535 range at config load time.
