@@ -368,6 +368,31 @@ uv run python -m beyond_mcp
 
 More examples, including LAN-targeted setups: [docs/mcp-config-examples.md](docs/mcp-config-examples.md)
 
+## Codex
+
+Create a `codex.json` MCP config file:
+
+```json
+{
+  "mcpServers": {
+    "beyond": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/beyond-mcp", "python", "-m", "beyond_mcp"],
+      "env": {
+        "BEYOND_HOST": "127.0.0.1",
+        "BEYOND_OSC_PORT": "12000"
+      }
+    }
+  }
+}
+```
+
+Then run Codex with:
+
+```bash
+codex --mcp-config codex.json
+```
+
 ## Production safety
 
 This server is designed for live show environments where accidental commands can disrupt a running laser show. All 117 tools include full parameter validation.
