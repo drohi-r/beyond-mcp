@@ -14,7 +14,7 @@
 
 An MCP server for [Pangolin BEYOND](https://pangolin.com/pages/beyond) laser software. Exposes 117 tools across 20 categories covering show control, cue management, zone configuration, geometric correction, live parameter control, effects, projector alignment, safety limiters, and more — all via OSC.
 
-Built for live production. Pairs with [MA2 Agent](https://github.com/drohi-r/grandma2-mcp), [Resolume MCP](https://github.com/drohi-r/resolume-mcp), and [Companion MCP](https://github.com/drohi-r/companion-mcp) for full AI-driven show control.
+Built for live production. Pairs with [grandMA2 MCP](https://github.com/drohi-r/grandma2-mcp), [Resolume MCP](https://github.com/drohi-r/resolume-mcp), [MADRIX MCP](https://github.com/drohi-r/madrix-mcp), and [Companion MCP](https://github.com/drohi-r/companion-mcp) for full AI-driven show control.
 
 ## Why this exists
 
@@ -71,7 +71,27 @@ See also:
 | `BEYOND_CONFIRM_DESTRUCTIVE` | `0` | Set to `1` to require `confirm=true` on destructive operations (blackout, stop_all, etc.) |
 | `BEYOND_TRANSPORT` | `stdio` | MCP transport (`stdio`, `sse`, `streamable-http`) |
 
-## Safety Profiles
+## Architecture
+
+```mermaid
+graph TD
+    A["Beyond MCP Server<br/><code>beyond_mcp</code><br/>117 tools · 20 categories · safety gate"] --> B
+    B["OSC Client<br/>UDP fire-and-forget"] --> C
+    C["Pangolin BEYOND<br/>OSC input on port 12000"]
+
+    D["Safety Profiles<br/>lab · show-safe · read-only"] -.-> A
+    E["Preview Engine<br/>Dry-run OSC inspection"] -.-> A
+    F["Bundle Support<br/>Atomic multi-message delivery"] -.-> B
+
+    style A fill:#1a1a2e,stroke:#F59E0B,color:#fff
+    style B fill:#1a1a2e,stroke:#F59E0B,color:#fff
+    style C fill:#1a1a2e,stroke:#0f3460,color:#fff
+    style D fill:#0f3460,stroke:#0f3460,color:#fff
+    style E fill:#0f3460,stroke:#0f3460,color:#fff
+    style F fill:#0f3460,stroke:#0f3460,color:#fff
+```
+
+## Safety profiles
 
 `BEYOND_SAFETY_PROFILE` gives you a sane starting point without having to remember multiple flags:
 
@@ -312,11 +332,7 @@ uv run python -m beyond_mcp
 | `virtual_lj` | Enable or disable Virtual LJ mode |
 | `virtual_lj_fx` | Trigger a Virtual LJ effect |
 
-## MCP Client Setup
-
-Quick examples:
-
-### Claude Desktop
+## Claude Desktop
 
 ```json
 {
@@ -333,7 +349,7 @@ Quick examples:
 }
 ```
 
-### VS Code / Cursor
+## VS Code / Cursor
 
 ```json
 {
